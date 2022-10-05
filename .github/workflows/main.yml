@@ -14,7 +14,9 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
+env:
+  USERNAME:${{secrets.USERNAME}}
+  PASSWORD:${{secrets.PASSWORD}}
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -31,10 +33,7 @@ jobs:
       - name: Install Python dependencies
         run: python -m pip install --upgrade pip pandas
       - name: check and send birthday reminders
-        run:
-            env  USERNAME:${{secrets.USERNAME}}
-            env PASSWORD:${{secrets.PASSWORD}}
-            python main.py
+        run: python main.py
 
       # Runs a set of commands using the runners shell
 #       - name: Run a multi-line script
