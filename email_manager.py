@@ -2,10 +2,9 @@ import smtplib
 import os
 import time
 
-# username = os.environ.get("USERNAME")
-# password = os.environ.get("PASSWORD")
-username = "asta.dev.aite@gmail.com"
-password = "bfumalbwpqktfiew"
+username = os.environ.get("USERNAME")
+password = os.environ.get("PASSWORD")
+
 admin_email = username
 
 
@@ -33,12 +32,12 @@ class SendEmails:
                             print(f"About: {' and '.join(birthday_people_names)}")
                             print(only_birthday_people[0]['Birthday'])
                             print(reminder_days)
-                            # connection.sendmail(from_addr=username,
-                            #                     to_addrs=person["Email"],
-                            #                     msg=f"Subject: Birthday reminder\n\n Hi {person['Name']},\n "
-                            #                         f"the birthday of {' and '.join(birthday_people_names)} are coming. Be ready to congratulate "
-                            #                         f"on {only_birthday_people[0]['Birthday']}!\n It is in {reminder_days} "
-                            #                         f"days, do not miss it ;)")
+                            connection.sendmail(from_addr=username,
+                                                to_addrs=person["Email"],
+                                                msg=f"Subject: Birthday reminder\n\n Hi {person['Name']},\n "
+                                                    f"the birthday of {' and '.join(birthday_people_names)} are coming. Be ready to congratulate "
+                                                    f"on {only_birthday_people[0]['Birthday']}!\n It is in {reminder_days} "
+                                                    f"days, do not miss it ;)")
                         try_to_send = False
                         print("Success: emails was sent.")
                 except smtplib.SMTPRecipientsRefused:
