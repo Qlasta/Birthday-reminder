@@ -2,8 +2,13 @@ import smtplib
 import os
 import time
 
-username = os.environ.get("USERNAME")
-password = os.environ.get("PASSWORD")
+# username = os.environ.get("USERNAME")
+# password = os.environ.get("PASSWORD")
+username = "asta.dev.aite@gmail.com"
+password = "bfumalbwpqktfiew"
+admin_email = username
+
+
 smtp_server = "smtp.gmail.com"
 port = 587
 email_send_retries = 3
@@ -31,16 +36,28 @@ class SendEmails:
                             # connection.sendmail(from_addr=username,
                             #                     to_addrs=person["Email"],
                             #                     msg=f"Subject: Birthday reminder\n\n Hi {person['Name']},\n "
-                            #                         f"the birthday of {birthday_people_names} are coming. Be ready to congratulate "
-                            #                         f"on {' and '.join(birthday_people_names)} !\n It is in {reminder_days} "
-                            #                         f"days,do not miss it ;)")
+                            #                         f"the birthday of {' and '.join(birthday_people_names)} are coming. Be ready to congratulate "
+                            #                         f"on {only_birthday_people[0]['Birthday']}!\n It is in {reminder_days} "
+                            #                         f"days, do not miss it ;)")
                         try_to_send = False
+                        print("Success: emails was sent.")
                 except smtplib.SMTPRecipientsRefused:
                     print(f"Wrong email address, email sending has stopped.")
                     try_to_send = False
                 except:
                     try_to_send = True
+                    print("Something is wrong in email sending process. Retrying.")
                     time.sleep(seconds_to_next_retry)
-                    print("attempt")
             else:
                 pass
+        if try_to_send == True:
+            print("Something is wrong in email sending process. Emails were not sent.")
+
+    def send_errors(self, errors):
+        with smtplib.SMTP(smtp_server, port=port) as connection:
+            connection.starttls()
+            connection.login(user=username, password=password)
+            connection.sendmail(from_addr=username,
+                                    to_addrs=admin_email,
+                                    msg=f"Subject: Errors in birthday file\n\n Error list:\n{errors}")
+
