@@ -5,27 +5,25 @@ from error_manager import ValidateFile
 import sys
 
 cmd_args = sys.argv
-
-
-filename = "birthdays.csv"
-try:
-    df = pd.read_csv(filename, header=None, names=["Name", "Email", "Birthday"])
-except FileNotFoundError:
-    print(f"No such file in directory, please upload {filename} and try again.")
-    exit()
-
-
-all_birth_dates = df.to_dict(orient="index")
-
 reminder_days = 7
 today = dt.datetime.now()
 day_after_week = today + dt.timedelta(days=reminder_days)
-birthday_year = str(day_after_week.year)
+filename = "birthdays.csv"
+
+# Validate file and get data
+try:
+    df = pd.read_csv(filename)
+    df.columns = ["Name", "Email", "Birthday"]
+except FileNotFoundError:
+    error_string = f"No such file in directory, please upload {filename} and try again."
+    print(error_string)
+    SendEmails().send_errors(error_string)
+    exit()
+all_birth_dates = df.to_dict(orient="index")
+
+# Validate data format in file, exit if there are mistakes
 validation = ValidateFile()
-validation.check_formats(all_birth_dates, today, birthday_year)
-
-
-
+validation.check_formats(all_birth_dates, today, day_after_week)
 if len(validation.error_list):
     print("Errors found (list has been sent to admin email). Please correct and try again.")
     error_string = ''
@@ -36,6 +34,8 @@ if len(validation.error_list):
     exit()
 else:
     print("Success: file is valid.")
+
+# Exit code if chosen command was only to validate
 if len(cmd_args) > 1:
     if cmd_args[1] == "validate":
         exit()
@@ -49,7 +49,8 @@ for n in all_birth_dates:
         only_birthdays.append(all_birth_dates[n])
     else:
         not_birthdays.append(all_birth_dates[n])
-# Send emails
+
+# Send emails if there are birthdays in chose days
 ## 1.For all not birthday people
 if len(only_birthdays):
     SendEmails().send_birthday_reminder(only_birthdays, not_birthdays, reminder_days)
@@ -60,6 +61,3 @@ if len(only_birthdays):
             send_to = [n]
             about = [pers for pers in only_birthdays if pers != n]
             SendEmails().send_birthday_reminder(about, send_to, reminder_days)
-
-
-
