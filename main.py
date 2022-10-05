@@ -23,7 +23,7 @@ day_after_week = today + dt.timedelta(days=reminder_days)
 birthday_year = str(day_after_week.year)
 validation = ValidateFile()
 validation.check_formats(all_birth_dates, today, birthday_year)
-print(all_birth_dates)
+
 
 
 if len(validation.error_list):
@@ -61,9 +61,5 @@ if len(only_birthdays):
             about = [pers for pers in only_birthdays if pers != n]
             SendEmails().send_birthday_reminder(about, send_to, reminder_days)
 
-
-
-print(not_birthdays)
-print(only_birthdays)
 
 
