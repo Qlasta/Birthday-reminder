@@ -2,9 +2,9 @@ import smtplib
 import os
 import time
 
-username = os.environ.get("USERNAME")
-password = os.environ.get("PASSWORD")
-admin_email = username
+USERNAME = os.environ.get("USERNAME")
+PASSWORD = os.environ.get("PASSWORD")
+admin_email = USERNAME
 smtp_server = "smtp.gmail.com"
 port = 587
 email_send_retries = 3
@@ -24,14 +24,14 @@ class SendEmails:
                 try:
                     with smtplib.SMTP(smtp_server, port=port) as connection:
                         connection.starttls()
-                        connection.login(user=username, password=password)
+                        connection.login(user=USERNAME, password=PASSWORD)
                         for person in not_birthday_people:
                             # print(person["Email"])
                             # print(f"For: {person['Name']}")
                             # print(f"About: {' and '.join(birthday_people_names)}")
                             # print(only_birthday_people[0]['Birthday'])
                             # print(reminder_days)
-                            connection.sendmail(from_addr=username,
+                            connection.sendmail(from_addr=USERNAME,
                                                 to_addrs=person["Email"],
                                                 msg=f"Subject: Birthday reminder\n\n Hi {person['Name']},\n "
                                                     f"the birthday of {' and '.join(birthday_people_names)} are coming. Be ready to congratulate "
@@ -59,8 +59,8 @@ class SendEmails:
         """ Sends email to admin, by giving errors in string format."""
         with smtplib.SMTP(smtp_server, port=port) as connection:
             connection.starttls()
-            connection.login(user=username, password=password)
-            connection.sendmail(from_addr=username,
+            connection.login(user=USERNAME, password=PASSWORD)
+            connection.sendmail(from_addr=USERNAME,
                                     to_addrs=admin_email,
                                     msg=f"Subject: Errors in birthday file\n\n Error list:\n{errors}")
 
