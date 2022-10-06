@@ -23,21 +23,25 @@ class ValidateFile:
                 error = f"Error in row {n + 2}. Missing data: Birthday."
                 self.error_list.append(error)
             else:
+                # to validate 02-29
+                if all_birthdates[n]["Birthday"] == '02-29':
+                    all_birthdates[n]["Birthday"] = '1904-02-29'
+                # format validation
                 try:
                     date = dt.datetime.strptime(all_birthdates[n]["Birthday"], "%Y-%m-%d")
                 except ValueError:
                     try:
-                        # does not validate 02-29
                         date = dt.datetime.strptime(all_birthdates[n]["Birthday"], "%m-%d")
                     except ValueError:
-                        error = f"Error in row {n + 2}. Date format is not correct, please enter YYYY-MM-DD or MM-DD."
+                        error = f"Error in row {n + 2}. Date is out of range or format is not correct, please enter " \
+                                f"YYYY-MM-DD or MM-DD."
                         self.error_list.append(error)
                     else:
                         # format to next birthday date
                         all_birthdates[n]["Birthday"] = birthday_year + "-" + date.strftime("%m-%d")
                 else:
                     if date > todays_date - dt.timedelta(days=1):
-                        error = f"Error. Row {n + 2} -date format is not correct, date should be in the past."
+                        error = f"Error. Row {n + 2}. Date format is not correct, date should be in the past."
                         self.error_list.append(error)
                     # format to next birthday date
                     all_birthdates[n]["Birthday"] = birthday_year + "-" + date.strftime("%m-%d")
