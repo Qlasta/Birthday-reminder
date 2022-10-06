@@ -26,11 +26,6 @@ class SendEmails:
                         connection.starttls()
                         connection.login(user=USERNAME, password=PASSWORD)
                         for person in not_birthday_people:
-                            # print(person["Email"])
-                            # print(f"For: {person['Name']}")
-                            # print(f"About: {' and '.join(birthday_people_names)}")
-                            # print(only_birthday_people[0]['Birthday'])
-                            # print(reminder_days)
                             connection.sendmail(from_addr=USERNAME,
                                                 to_addrs=person["Email"],
                                                 msg=f"Subject: Birthday reminder\n\n Hi {person['Name']},\n "
@@ -38,7 +33,7 @@ class SendEmails:
                                                     f"on {only_birthday_people[0]['Birthday']}!\n It is in {reminder_days} "
                                                     f"days, do not miss it ;)")
                         try_to_send = False
-                        print("Success: emails was sent.")
+                        print("Success: emails were sent.")
                 except smtplib.SMTPRecipientsRefused:
                     error = "Wrong email address, email sending has stopped."
                     print(error)
