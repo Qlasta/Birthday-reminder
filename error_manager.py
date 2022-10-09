@@ -1,21 +1,40 @@
 import datetime as dt
 import pandas as pd
+from email_manager import SendEmails
 
 
 class ValidateFile:
-    def __init__(self):
+    def __init__(self, today, target_day):
         self.error_list = []
+        self.todays_date = today
+        self.celebration_day = target_day
+        self.celebration_year = str(self.celebration_day.year)
 
-    def check_formats(self, all_birthdates, todays_date, day_after_week):
-        """ Takes all birthdates data in dictionary format, today's date and the day we check for birthday.
-        Modifies dates to next birthday date. Returns errors if mistakes found."""
-        birthday_year = str(day_after_week.year)
+    def check_csv_is_parsable(self, filename):
+        try:
+            df = pd.read_csv(filename, index_col=False)
+        except pd.errors.ParserError:
+            self.error_list.append(f"Data shape in file is not correct, please format to 3 valid columns and try "
+                                   f"again.")
+            return False
+        else:
+            if len(df.columns) != 3:
+                self.error_list.append(f"Data shape in file is not correct, please format to 3 valid columns and try "
+                                       f"again.")
+                return False
+            else:
+                return True
+
+    def check_formats(self, all_birthdates):
+        """ Requires all birthdates data in dictionary format. Modifies dates to next birthday date.
+        Ads errors to list if mistakes found."""
+        if all_birthdates == {}:
+            error = f"File is empty, please fill in the file and try again."
+            self.error_list.append(error)
         for n in all_birthdates:
             if pd.isna(all_birthdates[n]["Name"]):
                 error = f"Error in row {n + 2}. Missing data: Name."
                 self.error_list.append(error)
-            else:
-                pass
             if pd.isna(all_birthdates[n]["Email"]):
                 error = f"Error in row {n + 2}. Missing data: Email."
                 self.error_list.append(error)
@@ -23,10 +42,10 @@ class ValidateFile:
                 error = f"Error in row {n + 2}. Missing data: Birthday."
                 self.error_list.append(error)
             else:
-                # to validate 02-29
+                # Format validation
+                # - to validate 02-29
                 if all_birthdates[n]["Birthday"] == '02-29':
                     all_birthdates[n]["Birthday"] = '1904-02-29'
-                # format validation
                 try:
                     date = dt.datetime.strptime(all_birthdates[n]["Birthday"], "%Y-%m-%d")
                 except ValueError:
@@ -38,10 +57,19 @@ class ValidateFile:
                         self.error_list.append(error)
                     else:
                         # format to next birthday date
-                        all_birthdates[n]["Birthday"] = birthday_year + "-" + date.strftime("%m-%d")
+                        all_birthdates[n]["Birthday"] = self.celebration_year + "-" + date.strftime("%m-%d")
                 else:
-                    if date > todays_date - dt.timedelta(days=1):
+                    if date > self.todays_date - dt.timedelta(days=1):
                         error = f"Error. Row {n + 2}. Date format is not correct, date should be in the past."
                         self.error_list.append(error)
                     # format to next birthday date
-                    all_birthdates[n]["Birthday"] = birthday_year + "-" + date.strftime("%m-%d")
+                    all_birthdates[n]["Birthday"] = self.celebration_year + "-" + date.strftime("%m-%d")
+
+    def show_errors(self):
+        """Displays errors from list and sends by email."""
+        error_string = ''
+        for error in self.error_list:
+            error_string += "\n" + error
+        print("Errors found (list has been sent to admin email). Please correct and try again.")
+        print(error_string)
+        SendEmails().send_errors(error_string)
