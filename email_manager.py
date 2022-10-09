@@ -27,7 +27,7 @@ class SendEmails:
                         for person in not_birthday_people:
                             connection.sendmail(from_addr=USERNAME,
                                                 to_addrs=person["Email"],
-                                                msg=f"Subject: Birthday reminder\n\n Hi {person['Name']},\n the "
+                                                msg=f"Subject: Birthday reminder\n\n Hi {person['Name']},\n The "
                                                     f"birthday of {' and '.join(birthday_people_names)} are coming. "
                                                     f"Be ready to congratulate on {only_birthday_people[0]['Birthday']}!"
                                                     f"\n It is in {reminder_days} days, do not miss it ;)")
