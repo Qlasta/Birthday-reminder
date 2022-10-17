@@ -1,14 +1,12 @@
 import datetime as dt
 import pandas as pd
-from email_manager import SendEmails
+from email_manager import send_errors
 
 
-class ValidateFile:
+class FileValidator:
     def __init__(self, today, target_day):
         self.error_list = []
         self.todays_date = today
-        self.celebration_day = target_day
-        self.celebration_year = str(self.celebration_day.year)
 
     def check_csv_is_parsable(self, filename):
         try:
@@ -50,20 +48,15 @@ class ValidateFile:
                     date = dt.datetime.strptime(all_birthdates[n]["Birthday"], "%Y-%m-%d")
                 except ValueError:
                     try:
-                        date = dt.datetime.strptime(all_birthdates[n]["Birthday"], "%m-%d")
+                        dt.datetime.strptime(all_birthdates[n]["Birthday"], "%m-%d")
                     except ValueError:
                         error = f"Error in row {n + 2}. Date is out of range or format is not correct, please enter " \
                                 f"YYYY-MM-DD or MM-DD."
                         self.error_list.append(error)
-                    else:
-                        # format to next birthday date
-                        all_birthdates[n]["Birthday"] = self.celebration_year + "-" + date.strftime("%m-%d")
                 else:
                     if date > self.todays_date - dt.timedelta(days=1):
                         error = f"Error. Row {n + 2}. Date format is not correct, date should be in the past."
                         self.error_list.append(error)
-                    # format to next birthday date
-                    all_birthdates[n]["Birthday"] = self.celebration_year + "-" + date.strftime("%m-%d")
 
     def show_errors(self):
         """Displays errors from list and sends by email."""
@@ -72,4 +65,4 @@ class ValidateFile:
             error_string += "\n" + error
         print("Errors found (list has been sent to admin email). Please correct and try again.")
         print(error_string)
-        SendEmails().send_errors(error_string)
+        send_errors(error_string)
